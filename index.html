@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA Revenus — Ton parcours vers une compétence monétisable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1B17;
+    --bg-soft:#132520;
+    --surface:#1B2B25;
+    --surface-2:#20342C;
+    --border:rgba(237,236,230,0.09);
+    --text:#EDECE6;
+    --muted:#93A69C;
+    --gold:#D4A94B;
+    --gold-dim:#8C7237;
+    --green:#4FD1AE;
+    --danger:#E2725B;
+    --radius-s:6px;
+    --radius-m:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  h1,h2,h3,.serif{font-family:'Fraunces',serif;}
+  .app-shell{
+    max-width:900px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 20px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    background:rgba(15,27,23,0.92);
+    backdrop-filter:blur(6px);
+    z-index:10;
+    gap:12px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.15rem;
+    letter-spacing:0.2px;
+    white-space:nowrap;
+  }
+  .brand span{color:var(--gold);}
+  .tabs{
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tabs button{
+    background:transparent;
+    border:1px solid transparent;
+    color:var(--muted);
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    font-weight:500;
+    padding:7px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .tabs button:hover{color:var(--text);}
+  .tabs button.active{
+    background:var(--surface-2);
+    color:var(--gold);
+    border-color:var(--border);
+  }
+  /* ---------- MAIN / SCREENS ---------- */
+  main{flex:1;padding:24px 20px 60px;}
+  .screen{display:none;animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{color:var(--gold);font-size:0.8rem;font-weight:600;margin-bottom:6px;}
+  .hero h1{font-size:1.8rem;font-weight:600;margin:0 0 12px;line-height:1.25;}
+  .hero p{color:var(--muted);max-width:60ch;margin:0 0 20px;}
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--gold);
+    color:#12211B;
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    padding:11px 18px;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    transition:transform .12s, filter .12s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(0.98);}
+  .btn.secondary{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn.secondary:hover{background:var(--surface);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--border);
+    padding:8px 14px;
+    font-size:0.85rem;
+  }
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+
+  /* progress bar */
+  .progress-wrap{margin:22px 0;}
+  .progress-label{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted);margin-bottom:6px;}
+  .progress-track{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:99px;transition:width .4s ease;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-m);
+    padding:18px;
+  }
+
+  /* ---------- MODULE LIST (dashboard) ---------- */
+  .module-row{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:16px 18px;
+    background:var(--surface);
+    border-left:3px solid var(--border);
+    border-radius:var(--radius-s);
+    margin-bottom:12px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .module-row.unlocked{border-left-color:var(--gold);}
+  .module-row.done{border-left-color:var(--green);}
+  .module-row.locked{cursor:not-allowed;opacity:0.55;}
+  .module-row:hover.unlocked,.module-row:hover.done{background:var(--surface-2);}
+  .module-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 8px;
+    flex-shrink:0;
+  }
+  .module-info{flex:1;min-width:0;}
+  .module-info h3{margin:0 0 3px;font-size:1.02rem;font-weight:600;font-family:'Inter',sans-serif;}
+  .module-info p{margin:0;color:var(--muted);font-size:0.84rem;}
+  .module-status{font-size:0.78rem;font-family:'IBM Plex Mono',monospace;flex-shrink:0;text-align:right;color:var(--muted);}
+  .module-status.done{color:var(--green);}
+  .module-status.unlocked{color:var(--gold);}
+
+  /* ---------- MODULE SCREEN ---------- */
+  .lesson-pills{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px;}
+  .pill{
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:0.8rem;
+    font-family:'IBM Plex Mono',monospace;
+    padding:7px 12px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .pill.active{border-color:var(--gold);color:var(--gold);}
+  .pill.completed{color:var(--green);border-color:rgba(79,209,174,0.4);}
+  .pill:disabled{opacity:0.4;cursor:not-allowed;}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px;}
+  .stat{
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:var(--radius-s);
+    padding:8px 12px;
+    font-size:0.78rem;
+    color:var(--muted);
+  }
+  .stat b{color:var(--text);font-family:'IBM Plex Mono',monospace;font-weight:600;display:block;font-size:0.95rem;margin-top:2px;}
+
+  .block{margin:16px 0;}
+  .block h4{margin:0 0 6px;font-size:0.78rem;letter-spacing:0.3px;color:var(--gold);text-transform:none;font-family:'Inter',sans-serif;font-weight:600;}
+  .block p{margin:0;color:var(--text);}
+  .block .box{
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:var(--radius-s);
+    padding:12px 14px;
+    color:var(--text);
+    font-size:0.94rem;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 11px;font-size:0.8rem;color:var(--text);}
+
+  textarea.exercise-input{
+    width:100%;
+    min-height:80px;
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:var(--radius-s);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:0.92rem;
+    padding:10px 12px;
+    resize:vertical;
+  }
+  textarea.exercise-input:focus{outline:1px solid var(--gold);}
+  .save-hint{font-size:0.74rem;color:var(--muted);margin-top:4px;}
+
+  /* ---------- QUIZ ---------- */
+  .quiz-q{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-m);
+    padding:16px 18px;
+    margin-bottom:14px;
+  }
+  .quiz-q p.q-text{font-weight:600;margin:0 0 12px;}
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+  .opt:hover{background:var(--bg-soft);}
+  .opt input{margin-top:3px;accent-color:var(--gold);}
+  .opt.correct{border-color:var(--green);background:rgba(79,209,174,0.08);}
+  .opt.incorrect{border-color:var(--danger);background:rgba(226,114,91,0.08);}
+  .q-feedback{font-size:0.82rem;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);}
+
+  .result-banner{
+    text-align:center;
+    padding:24px 18px;
+    border-radius:var(--radius-m);
+    border:1px solid var(--border);
+    background:var(--surface);
+    margin-bottom:16px;
+  }
+  .result-banner .score{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;}
+  .result-banner.success{border-color:rgba(79,209,174,0.5);}
+  .result-banner.retry{border-color:rgba(226,114,91,0.4);}
+
+  /* ---------- PROFILE FORM ---------- */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px;font-weight:500;}
+  .field select, .field input[type=text]{
+    width:100%;
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:var(--radius-s);
+    padding:10px 12px;
+    font-family:'Inter',sans-serif;
+    font-size:0.92rem;
+  }
+  .field select:focus, .field input:focus{outline:1px solid var(--gold);}
+  .checkbox-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  .checkbox-grid label{
+    display:flex;align-items:center;gap:6px;
+    background:var(--bg-soft);border:1px solid var(--border);
+    border-radius:999px;padding:7px 12px;font-size:0.83rem;color:var(--text);
+    cursor:pointer;margin:0;
+  }
+  .checkbox-grid input{accent-color:var(--gold);}
+
+  /* ---------- PROGRESS TABLE ---------- */
+  table{width:100%;border-collapse:collapse;margin-top:14px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);font-size:0.86rem;}
+  th{color:var(--muted);font-weight:500;font-size:0.78rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--surface-2);border:1px solid var(--gold);color:var(--text);
+    padding:10px 18px;border-radius:999px;font-size:0.85rem;
+    box-shadow:0 6px 20px rgba(0,0,0,0.35);
+    opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+    z-index:100;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  footer{
+    text-align:center;
+    padding:16px;
+    color:var(--muted);
+    font-size:0.78rem;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width:560px){
+    .hero h1{font-size:1.45rem;}
+    .topbar{padding:14px 14px;}
+    main{padding:18px 14px 50px;}
+    .stat-row{gap:8px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">IA<span>Revenus</span></div>
+    <nav class="tabs" id="nav-tabs">
+      <button data-screen="home">Accueil</button>
+      <button data-screen="dashboard">Modules</button>
+      <button data-screen="progress">Progression</button>
+      <button data-screen="profile">Profil</button>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- ===================== HOME ===================== -->
+    <section id="screen-home" class="screen">
+      <div class="eyebrow">Ton objectif</div>
+      <div class="hero">
+        <h1>Passer de « je ne sais pas comment gagner de l'argent avec l'IA » à une compétence monétisable, une offre claire et un plan pour trouver tes premiers clients.</h1>
+        <p>Méthode : 20% théorie, 80% pratique. Chaque notion vient avec un exemple, un exercice concret, et un test pour vérifier que tu as compris avant d'avancer.</p>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Progression globale</span><span id="home-progress-pct" class="mono">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="home-progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">Module 1 — Les 5 grandes catégories de business IA</h3>
+        <p style="color:var(--muted);margin-bottom:0;">Découvre les 5 façons réalistes de générer des revenus avec l'IA, avec pour chacune : un exemple, un produit vendable, les outils, la difficulté, le temps, une fourchette de prix, et un exercice. Un quiz final vérifiera ce que tu as retenu.</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="btn-start">Commencer mon parcours</button>
+        <button class="btn secondary" id="btn-see-modules">Voir les modules</button>
+      </div>
+    </section>
+
+    <!-- ===================== PROFILE ===================== -->
+    <section id="screen-profile" class="screen">
+      <div class="eyebrow">Avant de commencer</div>
+      <h1 style="font-size:1.4rem;">Parlons de ton profil</h1>
+      <p style="color:var(--muted);max-width:60ch;">Ces réponses servent à adapter la suite du parcours (les modules à venir) à ta situation réelle. Tu peux les modifier à tout moment depuis l'onglet Profil.</p>
+
+      <div class="field">
+        <label>Tes compétences actuelles (coche tout ce qui s'applique)</label>
+        <div class="checkbox-grid" id="skills-grid">
+          <label><input type="checkbox" value="Rédaction / communication"> Rédaction / communication</label>
+          <label><input type="checkbox" value="Support client / relation client"> Support client / relation client</label>
+          <label><input type="checkbox" value="Bricolage informatique / hardware PC"> Bricolage informatique / hardware PC</label>
+          <label><input type="checkbox" value="Design visuel"> Design visuel</label>
+          <label><input type="checkbox" value="Un peu de code / no-code"> Un peu de code / no-code</label>
+          <label><input type="checkbox" value="Aucune compétence technique pour l'instant"> Aucune compétence technique pour l'instant</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="in-time">Temps disponible par semaine</label>
+        <select id="in-time">
+          <option value="">— Choisir —</option>
+          <option>Moins de 2h</option>
+          <option>2 à 5h</option>
+          <option>5 à 10h</option>
+          <option>Plus de 10h</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="in-budget">Budget de départ disponible</label>
+        <select id="in-budget">
+          <option value="">— Choisir —</option>
+          <option>0 — uniquement des outils gratuits</option>
+          <option>Moins de 20 000 Ar</option>
+          <option>20 000 à 100 000 Ar</option>
+          <option>Plus de 100 000 Ar</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="in-interests">Tes centres d'intérêt</label>
+        <input type="text" id="in-interests" placeholder="Ex : jeux vidéo, montage PC, enseignement...">
+      </div>
+
+      <div class="field">
+        <label for="in-tech">Ton niveau technique</label>
+        <select id="in-tech">
+          <option value="">— Choisir —</option>
+          <option>Débutant total</option>
+          <option>Je me débrouille avec un ordinateur et quelques logiciels</option>
+          <option>Je sais un peu coder / configurer des systèmes</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="in-pref">Tu préfères plutôt...</label>
+        <select id="in-pref">
+          <option value="">— Choisir —</option>
+          <option>Vendre des services (missions pour des clients)</option>
+          <option>Vendre des produits (créés une fois, vendus plusieurs fois)</option>
+          <option>Construire une activité automatisée qui tourne sans moi</option>
+          <option>Je ne sais pas encore</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="btn-save-profile">Enregistrer et continuer</button>
+      </div>
+    </section>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="screen-dashboard" class="screen">
+      <div class="eyebrow">Programme</div>
+      <h1 style="font-size:1.4rem;">Tes modules</h1>
+      <div id="modules-list"></div>
+    </section>
+
+    <!-- ===================== MODULE ===================== -->
+    <section id="screen-module" class="screen">
+      <button class="btn ghost" id="btn-back-dashboard">← Retour aux modules</button>
+      <div id="module-content"></div>
+    </section>
+
+    <!-- ===================== PROGRESS TABLE ===================== -->
+    <section id="screen-progress" class="screen">
+      <div class="eyebrow">Suivi</div>
+      <h1 style="font-size:1.4rem;">Tableau de progression</h1>
+      <div id="progress-content"></div>
+    </section>
+
+  </main>
+
+  <footer>Créé par Tsiory</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     DONNÉES DU CONTENU
+  ============================================================ */
+  var CATEGORY_LABELS = [
+    "Services IA sur mesure",
+    "Produits numériques IA",
+    "Formation & coaching IA",
+    "Contenu automatisé avec IA",
+    "Automatisation de processus pour entreprises"
+  ];
+
+  var LESSONS_M1 = [
+    {
+      title: "Services IA sur mesure",
+      explanation: "Tu vends ton temps et ton savoir-faire pour résoudre un problème précis d'un client, en utilisant l'IA comme outil pour aller plus vite et livrer une meilleure qualité. C'est le point d'entrée le plus accessible : pas besoin de produit fini, juste une compétence et un client qui a un problème urgent à résoudre.",
+      example: "Une PME malgache veut répondre plus vite à ses clients sur WhatsApp mais n'a pas le temps de rédiger chaque message. Tu configures un assistant IA qui prépare des brouillons de réponses.",
+      product: "« Mise en place d'un assistant de réponse client IA » pour petites entreprises locales.",
+      tools: ["ChatGPT / Claude", "Make.com ou Zapier", "WhatsApp Business"],
+      difficulty: 3,
+      time: "3 à 6h par client (une fois la méthode rodée)",
+      price: "50 000 à 300 000 Ar par mission (≈15-70 USD)",
+      exercise: "Liste 3 entreprises que tu connais (famille, quartier, ancien employeur) qui perdent du temps sur une tâche répétitive d'écriture ou de réponse client."
+    },
+    {
+      title: "Produits numériques IA",
+      explanation: "Au lieu de vendre ton temps, tu crées une seule fois un produit — modèle, outil, mini-application — et tu le vends plusieurs fois sans refaire le travail. L'IA t'aide à le concevoir et à le construire rapidement, même sans compétences avancées en programmation.",
+      example: "Un pack de 50 prompts ChatGPT pour rédiger des annonces immobilières, vendu en PDF téléchargeable.",
+      product: "Un mini-générateur web (comme tes projets HTML) qui crée des CV ou des posts réseaux sociaux automatiquement.",
+      tools: ["Claude / ChatGPT", "Canva", "Gumroad ou Payhip"],
+      difficulty: 5,
+      time: "1 à 3 jours pour la première version",
+      price: "5 à 30 USD par vente (petit prix, volume)",
+      exercise: "Note un problème récurrent que rencontrent des gens dans un domaine que tu connais bien (jeux vidéo, montage PC, service client) et qui pourrait être résolu par un modèle réutilisable."
+    },
+    {
+      title: "Formation & coaching IA",
+      explanation: "Tu transmets ce que tu sais sur l'IA à des personnes qui n'ont pas le temps ou l'envie d'apprendre seules. Pas besoin d'être un expert mondial : avoir une longueur d'avance suffit pour être utile à quelqu'un qui n'a jamais utilisé ces outils.",
+      example: "Une session d'1h en visio pour apprendre à un commerçant à utiliser ChatGPT afin de rédiger ses publications Facebook.",
+      product: "Atelier « Découvre l'IA en 2h » pour indépendants et petites entreprises, en présentiel ou en ligne.",
+      tools: ["ChatGPT / Claude", "Canva ou Google Slides", "Zoom / Google Meet"],
+      difficulty: 4,
+      time: "2 à 4h de préparation, puis 1-2h par session",
+      price: "10 000 à 100 000 Ar par session individuelle (≈10-40 USD)",
+      exercise: "Choisis une chose que tu sais déjà bien faire avec l'IA (ex : monter un site en HTML avec Claude) et écris 3 phrases simples pour l'expliquer à quelqu'un qui n'y connaît rien."
+    },
+    {
+      title: "Contenu automatisé avec IA",
+      explanation: "Tu utilises l'IA pour produire régulièrement du contenu (textes, images, vidéos courtes) destiné aux réseaux sociaux ou à un site, dans le but de gagner une audience puis de la monétiser par la publicité, l'affiliation ou la promotion de services.",
+      example: "Un compte TikTok ou Facebook qui publie chaque jour une astuce PC gaming générée et illustrée avec l'IA.",
+      product: "Gestion de contenu automatisé pour le compte réseaux sociaux d'un petit commerce local, facturée au mois.",
+      tools: ["Claude / ChatGPT", "Canva ou Leonardo", "CapCut", "Buffer / Later"],
+      difficulty: 6,
+      time: "30 à 60 min par jour une fois le système en place",
+      price: "100 000 à 500 000 Ar par mois et par client (≈25-120 USD)",
+      exercise: "Choisis un sujet qui te passionne (jeux vidéo, hardware PC) et imagine le titre de 3 publications que tu pourrais générer avec l'IA cette semaine."
+    },
+    {
+      title: "Automatisation de processus pour entreprises",
+      explanation: "Tu connectes plusieurs outils entre eux (IA + logiciels) pour qu'une tâche répétitive se fasse toute seule dans une entreprise : trier des emails, remplir un tableau, relancer des clients. C'est le service le plus technique, mais aussi le mieux payé, car il fait gagner un temps mesurable à l'entreprise.",
+      example: "Chaque nouveau message reçu sur un formulaire de contact est automatiquement résumé par l'IA et ajouté à un Google Sheets avec une réponse suggérée.",
+      product: "« Système de tri automatique des demandes clients » vendu comme installation unique + abonnement de maintenance.",
+      tools: ["Make.com ou n8n", "API Claude / ChatGPT", "Google Sheets", "Zapier"],
+      difficulty: 8,
+      time: "1 à 5 jours selon la complexité du système",
+      price: "200 000 à 1 500 000 Ar à l'installation (≈50-350 USD) + abonnement mensuel",
+      exercise: "Repère une tâche répétitive dans un ancien travail (centre d'appel, service client) qui prenait du temps chaque jour et qui aurait pu être automatisée."
+    }
+  ];
+
+  var QUIZ_M1 = [
+    {
+      q: "Une entreprise te demande de connecter son formulaire de contact à un Google Sheets rempli automatiquement par l'IA. À quelle catégorie appartient cette mission ?",
+      options: CATEGORY_LABELS,
+      correct: 4,
+      lesson: 4,
+      feedback: "C'est de l'automatisation de processus : on relie des outils entre eux pour supprimer une tâche répétitive."
+    },
+    {
+      q: "Tu vends un pack de templates de CV que n'importe qui peut acheter et télécharger, sans que tu aies à refaire le travail à chaque vente. De quelle catégorie s'agit-il ?",
+      options: CATEGORY_LABELS,
+      correct: 1,
+      lesson: 1,
+      feedback: "Un produit créé une fois et vendu plusieurs fois est un produit numérique IA."
+    },
+    {
+      q: "Tu donnes un atelier d'1h à un commerçant pour lui apprendre à utiliser ChatGPT. Quelle catégorie ?",
+      options: CATEGORY_LABELS,
+      correct: 2,
+      lesson: 2,
+      feedback: "Transmettre ton savoir à quelqu'un d'autre, c'est de la formation / du coaching."
+    },
+    {
+      q: "Tu publies chaque jour une courte vidéo générée avec l'IA sur un sujet qui te passionne, pour développer une audience. Quelle catégorie ?",
+      options: CATEGORY_LABELS,
+      correct: 3,
+      lesson: 3,
+      feedback: "Publier régulièrement du contenu généré par l'IA pour construire une audience, c'est le contenu automatisé."
+    },
+    {
+      q: "Un client te paie une seule fois pour configurer un assistant qui rédige ses réponses clients sur WhatsApp. Quelle catégorie ?",
+      options: CATEGORY_LABELS,
+      correct: 0,
+      lesson: 0,
+      feedback: "Une mission ponctuelle pour un client précis, c'est un service IA sur mesure."
+    }
+  ];
+
+  var MODULE_META = {
+    1: { title: "Les 5 grandes catégories de business IA", desc: "Découvrir les façons réalistes de générer des revenus avec l'IA." },
+    2: { title: "Trouver un problème qui vaut de l'argent", desc: "Se débloque après le Module 1." },
+    3: { title: "Construire ton offre et trouver ton premier client", desc: "Se débloque après le Module 2." }
+  };
+
+  /* ============================================================
+     ÉTAT & PERSISTANCE
+  ============================================================ */
+  var STORAGE_KEY = "iaRevenusAcademyState_v1";
+
+  function defaultState(){
+    return {
+      profileDone: false,
+      profile: { skills: [], time: "", budget: "", interests: "", tech: "", pref: "" },
+      currentScreen: "home",
+      moduleView: { moduleId: 1, tab: "lesson-0" },
+      exerciseNotes: {}, // key "m1-0" -> text
+      modules: {
+        1: { unlocked: true,  lessonsCompleted: [false,false,false,false,false], quizDone: false, quizScore: 0, quizAnswers: [null,null,null,null,null], mastered: false },
+        2: { unlocked: false, lessonsCompleted: [], quizDone: false, quizScore: 0, quizAnswers: [], mastered: false },
+        3: { unlocked: false, lessonsCompleted: [], quizDone: false, quizScore: 0, quizAnswers: [], mastered: false }
+      }
+    };
+  }
+
+  var state = loadState();
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      // fusion défensive avec l'état par défaut (au cas où de nouveaux champs apparaissent)
+      var d = defaultState();
+      for(var k in d){ if(!(k in parsed)) parsed[k] = d[k]; }
+      if(!parsed.modules) parsed.modules = d.modules;
+      for(var m in d.modules){ if(!parsed.modules[m]) parsed.modules[m] = d.modules[m]; }
+      if(!parsed.exerciseNotes) parsed.exerciseNotes = {};
+      return parsed;
+    }catch(e){
+      return defaultState();
+    }
+  }
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  /* ============================================================
+     UTILITAIRES UI
+  ============================================================ */
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+
+  var toastTimer = null;
+  function toast(msg){
+    var el = $("#toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2200);
+  }
+
+  function showScreen(name){
+    $all(".screen").forEach(function(s){ s.classList.remove("active"); });
+    var target = $("#screen-" + name);
+    if(target) target.classList.add("active");
+    $all("#nav-tabs button").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-screen") === name);
+    });
+    state.currentScreen = name;
+    saveState();
+    if(name === "dashboard") renderDashboard();
+    if(name === "progress") renderProgress();
+    if(name === "home") renderHome();
+    window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+  }
+
+  /* ============================================================
+     PROGRESSION GLOBALE
+  ============================================================ */
+  function computeOverallProgress(){
+    // Pour l'instant seul le module 1 a du contenu réel : 5 leçons + 1 quiz maîtrisé = 6 unités
+    var m1 = state.modules[1];
+    var done = m1.lessonsCompleted.filter(Boolean).length;
+    if(m1.mastered) done += 1;
+    var pct = Math.round((done / 6) * 100);
+    return pct;
+  }
+
+  function renderHome(){
+    var pct = computeOverallProgress();
+    $("#home-progress-pct").textContent = pct + "%";
+    $("#home-progress-fill").style.width = pct + "%";
+  }
+
+  /* ============================================================
+     PROFIL
+  ============================================================ */
+  function fillProfileForm(){
+    var p = state.profile;
+    $all("#skills-grid input").forEach(function(cb){
+      cb.checked = p.skills.indexOf(cb.value) !== -1;
+    });
+    $("#in-time").value = p.time || "";
+    $("#in-budget").value = p.budget || "";
+    $("#in-interests").value = p.interests || "";
+    $("#in-tech").value = p.tech || "";
+    $("#in-pref").value = p.pref || "";
+  }
+
+  $("#btn-save-profile").addEventListener("click", function(){
+    var skills = $all("#skills-grid input:checked").map(function(cb){ return cb.value; });
+    state.profile = {
+      skills: skills,
+      time: $("#in-time").value,
+      budget: $("#in-budget").value,
+      interests: $("#in-interests").value.trim(),
+      tech: $("#in-tech").value,
+      pref: $("#in-pref").value
+    };
+    state.profileDone = true;
+    saveState();
+    toast("Profil enregistré");
+    showScreen("dashboard");
+  });
+
+  /* ============================================================
+     DASHBOARD (liste des modules)
+  ============================================================ */
+  function renderDashboard(){
+    var wrap = $("#modules-list");
+    wrap.innerHTML = "";
+    [1,2,3].forEach(function(id){
+      var mod = state.modules[id];
+      var meta = MODULE_META[id];
+      var row = document.createElement("div");
+      var statusClass = mod.unlocked ? (mod.mastered ? "done" : "unlocked") : "locked";
+      row.className = "module-row " + statusClass;
+
+      var statusText;
+      if(!mod.unlocked){ statusText = "🔒 Verrouillé"; }
+      else if(mod.mastered){ statusText = "✓ Terminé"; }
+      else if(id === 1){
+        var doneCount = mod.lessonsCompleted.filter(Boolean).length;
+        statusText = doneCount + "/5 leçons";
+      } else {
+        statusText = "À commencer";
+      }
+
+      row.innerHTML =
+        '<div class="module-num mono">M' + id + '</div>' +
+        '<div class="module-info"><h3>' + meta.title + '</h3><p>' + meta.desc + '</p></div>' +
+        '<div class="module-status ' + statusClass + ' mono">' + statusText + '</div>';
+
+      if(mod.unlocked){
+        row.addEventListener("click", function(){
+          openModule(id);
+        });
+      }
+      wrap.appendChild(row);
+    });
+  }
+
+  /* ============================================================
+     ECRAN MODULE (leçons + quiz)
+  ============================================================ */
+  function openModule(id){
+    state.moduleView.moduleId = id;
+    if(id !== 1){
+      // modules 2/3 : contenu à venir (structure prête, verrouillé tant que non débloqué logiquement,
+      // mais si jamais unlocked=true sans contenu, on affiche un message d'attente)
+      showScreen("module");
+      $("#module-content").innerHTML =
+        '<div class="eyebrow">Module ' + id + '</div>' +
+        '<h1 style="font-size:1.3rem;">' + MODULE_META[id].title + '</h1>' +
+        '<div class="card"><p style="margin:0;color:var(--muted);">Ce module arrive juste après le Module 1. Reviens ici une fois le Module 1 maîtrisé — le contenu détaillé (leçons + quiz) sera ajouté dans la prochaine version de ton parcours.</p></div>';
+      return;
+    }
+    state.moduleView.tab = "lesson-0";
+    saveState();
+    showScreen("module");
+    renderModule1();
+  }
+
+  $("#btn-back-dashboard").addEventListener("click", function(){ showScreen("dashboard"); });
+
+  function renderModule1(){
+    var mod = state.modules[1];
+    var tab = state.moduleView.tab;
+    var content = $("#module-content");
+
+    var pillsHtml = '<div class="lesson-pills">';
+    LESSONS_M1.forEach(function(l, i){
+      var isActive = tab === "lesson-" + i;
+      var isDone = mod.lessonsCompleted[i];
+      pillsHtml += '<button class="pill ' + (isActive?"active":"") + ' ' + (isDone?"completed":"") + '" data-tab="lesson-' + i + '">' +
+        (isDone ? "✓ " : "") + (i+1) + '. ' + l.title.split(" ")[0] + (l.title.split(" ").length>1? " "+l.title.split(" ")[1]:"") + '</button>';
+    });
+    var allDone = mod.lessonsCompleted.every(Boolean);
+    pillsHtml += '<button class="pill ' + (tab==="quiz"?"active":"") + '" data-tab="quiz" ' + (allDone?"":'disabled title="Termine les 5 lecons avant le quiz"') + '>📝 Quiz final</button>';
+    pillsHtml += '</div>';
+
+    var headerHtml =
+      '<div class="eyebrow">Module 1</div>' +
+      '<h1 style="font-size:1.35rem;margin-bottom:4px;">Les 5 grandes catégories de business IA</h1>' +
+      pillsHtml;
+
+    if(tab === "quiz"){
+      content.innerHTML = headerHtml + '<div id="quiz-zone"></div>';
+      renderQuiz1();
+    } else {
+      var idx = parseInt(tab.split("-")[1], 10);
+      content.innerHTML = headerHtml + renderLessonHtml(idx);
+      bindLessonEvents(idx);
+    }
+
+    $all(".lesson-pills .pill").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(btn.disabled) return;
+        state.moduleView.tab = btn.getAttribute("data-tab");
+        saveState();
+        renderModule1();
+      });
+    });
+
+    // bouton recommencer le module (ajouté en bas)
+    var resetBtn = document.createElement("div");
+    resetBtn.style.marginTop = "26px";
+    resetBtn.innerHTML = '<button class="btn ghost" id="btn-reset-module">↺ Recommencer ce module</button>';
+    content.appendChild(resetBtn);
+    $("#btn-reset-module").addEventListener("click", function(){
+      if(confirm("Recommencer le Module 1 ? Ta progression sur ce module sera remise à zéro.")){
+        state.modules[1] = { unlocked: true, lessonsCompleted: [false,false,false,false,false], quizDone:false, quizScore:0, quizAnswers:[null,null,null,null,null], mastered:false };
+        state.moduleView.tab = "lesson-0";
+        saveState();
+        toast("Module 1 réinitialisé");
+        renderModule1();
+      }
+    });
+  }
+
+  function renderLessonHtml(i){
+    var l = LESSONS_M1[i];
+    var noteKey = "m1-" + i;
+    var savedNote = state.exerciseNotes[noteKey] || "";
+    var diffPct = (l.difficulty/10*100);
+
+    return (
+      '<h2 style="font-size:1.2rem;margin:14px 0 4px;">' + (i+1) + '. ' + l.title + '</h2>' +
+      '<div class="stat-row">' +
+        '<div class="stat">Difficulté<b>' + l.difficulty + '/10</b></div>' +
+        '<div class="stat">Temps<b>' + l.time + '</b></div>' +
+        '<div class="stat">Prix indicatif<b>' + l.price + '</b></div>' +
+      '</div>' +
+      '<div class="block"><h4>Explication</h4><p>' + l.explanation + '</p></div>' +
+      '<div class="block"><h4>Exemple concret</h4><div class="box">' + l.example + '</div></div>' +
+      '<div class="block"><h4>Ce que tu pourrais vendre</h4><div class="box">' + l.product + '</div></div>' +
+      '<div class="block"><h4>Outils IA nécessaires</h4><div class="chips">' + l.tools.map(function(t){return '<span class="chip">'+t+'</span>';}).join("") + '</div></div>' +
+      '<div class="block"><h4>Exercice pratique immédiat</h4><div class="box" style="margin-bottom:8px;">' + l.exercise + '</div>' +
+        '<textarea class="exercise-input" id="exercise-note" placeholder="Note ta réponse ici (sauvegardée automatiquement)...">' + savedNote + '</textarea>' +
+        '<div class="save-hint">Sauvegardé automatiquement dans ton navigateur.</div>' +
+      '</div>' +
+      '<div class="btn-row">' +
+        (i>0 ? '<button class="btn secondary" id="btn-prev-lesson">← Leçon précédente</button>' : '') +
+        '<button class="btn" id="btn-done-lesson">' + (i<4 ? "J'ai compris → Leçon suivante" : "J'ai compris → Passer au quiz") + '</button>' +
+      '</div>'
+    );
+  }
+
+  function bindLessonEvents(i){
+    var noteKey = "m1-" + i;
+    var textarea = $("#exercise-note");
+    if(textarea){
+      textarea.addEventListener("blur", function(){
+        state.exerciseNotes[noteKey] = textarea.value;
+        saveState();
+      });
+    }
+    var prevBtn = $("#btn-prev-lesson");
+    if(prevBtn){
+      prevBtn.addEventListener("click", function(){
+        state.moduleView.tab = "lesson-" + (i-1);
+        saveState();
+        renderModule1();
+      });
+    }
+    $("#btn-done-lesson").addEventListener("click", function(){
+      state.modules[1].lessonsCompleted[i] = true;
+      state.moduleView.tab = (i<4) ? ("lesson-" + (i+1)) : "quiz";
+      saveState();
+      renderModule1();
+      renderHome();
+    });
+  }
+
+  /* ============================================================
+     QUIZ MODULE 1
+  ============================================================ */
+  function renderQuiz1(){
+    var mod = state.modules[1];
+    var zone = $("#quiz-zone");
+
+    if(mod.quizDone){
+      renderQuizResult();
+      return;
+    }
+
+    var html = '<p style="color:var(--muted);margin:12px 0 18px;">Réponds aux 5 questions, puis clique sur « Valider mes réponses ».</p>';
+    QUIZ_M1.forEach(function(q, qi){
+      html += '<div class="quiz-q"><p class="q-text">' + (qi+1) + '. ' + q.q + '</p>';
+      q.options.forEach(function(opt, oi){
+        html += '<label class="opt"><input type="radio" name="q' + qi + '" value="' + oi + '"> <span>' + opt + '</span></label>';
+      });
+      html += '</div>';
+    });
+    html += '<div class="btn-row"><button class="btn" id="btn-submit-quiz">Valider mes réponses</button></div>';
+    zone.innerHTML = html;
+
+    $("#btn-submit-quiz").addEventListener("click", function(){
+      var answers = [];
+      var allAnswered = true;
+      QUIZ_M1.forEach(function(q, qi){
+        var checked = $('input[name="q' + qi + '"]:checked');
+        if(!checked){ allAnswered = false; answers.push(null); }
+        else answers.push(parseInt(checked.value, 10));
+      });
+      if(!allAnswered){
+        toast("Réponds à toutes les questions avant de valider.");
+        return;
+      }
+      var score = 0;
+      answers.forEach(function(a, i){ if(a === QUIZ_M1[i].correct) score++; });
+
+      mod.quizAnswers = answers;
+      mod.quizScore = score;
+      mod.quizDone = true;
+      mod.mastered = score >= 4; // 80%
+      if(mod.mastered){
+        state.modules[2].unlocked = true;
+      }
+      saveState();
+      renderHome();
+      renderQuizResult();
+    });
+  }
+
+  function renderQuizResult(){
+    var mod = state.modules[1];
+    var zone = $("#quiz-zone");
+    var score = mod.quizScore;
+    var mastered = mod.mastered;
+
+    var html = '<div class="result-banner ' + (mastered ? "success" : "retry") + '">' +
+      '<div class="score mono">' + score + '/5</div>' +
+      '<p style="margin:8px 0 0;color:var(--muted);">' +
+      (mastered ? "Bravo, tu maîtrises les 5 catégories !" : "Presque ! Revois les notions ci-dessous avant de repasser le quiz.") +
+      '</p></div>';
+
+    var weakLessons = [];
+    html += '<div>';
+    QUIZ_M1.forEach(function(q, qi){
+      var userAnswer = mod.quizAnswers[qi];
+      var isCorrect = userAnswer === q.correct;
+      if(!isCorrect && weakLessons.indexOf(q.lesson) === -1) weakLessons.push(q.lesson);
+      html += '<div class="quiz-q"><p class="q-text">' + (qi+1) + '. ' + q.q + '</p>';
+      q.options.forEach(function(opt, oi){
+        var cls = "";
+        if(oi === q.correct) cls = "correct";
+        else if(oi === userAnswer && !isCorrect) cls = "incorrect";
+        html += '<div class="opt ' + cls + '"><span>' + (oi === userAnswer ? "● " : "○ ") + opt + '</span></div>';
+      });
+      html += '<div class="q-feedback">' + q.feedback + '</div></div>';
+    });
+    html += '</div>';
+
+    if(mastered){
+      html += '<div class="btn-row">' +
+        '<button class="btn" id="btn-goto-m2">Débloquer et voir le Module 2 →</button>' +
+        '<button class="btn secondary" id="btn-retake-quiz">Repasser le quiz</button>' +
+        '</div>';
+    } else {
+      html += '<div class="block"><h4>Notions à revoir</h4><div class="chips" id="weak-lessons-chips"></div></div>';
+      html += '<div class="btn-row"><button class="btn" id="btn-retake-quiz">Repasser le quiz</button></div>';
+    }
+
+    zone.innerHTML = html;
+
+    if(!mastered){
+      var chipsWrap = $("#weak-lessons-chips");
+      weakLessons.forEach(function(li){
+        var chip = document.createElement("span");
+        chip.className = "chip";
+        chip.style.cursor = "pointer";
+        chip.style.borderColor = "var(--gold)";
+        chip.textContent = "↻ Revoir : " + LESSONS_M1[li].title;
+        chip.addEventListener("click", function(){
+          state.moduleView.tab = "lesson-" + li;
+          saveState();
+          renderModule1();
+        });
+        chipsWrap.appendChild(chip);
+      });
+    }
+
+    var retakeBtn = $("#btn-retake-quiz");
+    if(retakeBtn){
+      retakeBtn.addEventListener("click", function(){
+        mod.quizDone = false;
+        mod.quizAnswers = [null,null,null,null,null];
+        saveState();
+        renderQuiz1();
+      });
+    }
+    var gotoM2 = $("#btn-goto-m2");
+    if(gotoM2){
+      gotoM2.addEventListener("click", function(){ showScreen("dashboard"); });
+    }
+  }
+
+  /* ============================================================
+     TABLEAU DE PROGRESSION
+  ============================================================ */
+  function renderProgress(){
+    var wrap = $("#progress-content");
+    var pct = computeOverallProgress();
+    var html = '<div class="progress-wrap"><div class="progress-label"><span>Progression globale</span><span class="mono">' + pct + '%</span></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+
+    html += '<table><thead><tr><th>Module</th><th>Statut</th><th>Leçons</th><th>Quiz</th></tr></thead><tbody>';
+    [1,2,3].forEach(function(id){
+      var mod = state.modules[id];
+      var statut = !mod.unlocked ? "Verrouillé" : (mod.mastered ? "Terminé ✓" : "En cours");
+      var lessonsText = (id === 1) ? (mod.lessonsCompleted.filter(Boolean).length + "/5") : "—";
+      var quizText = (id === 1) ? (mod.quizDone ? (mod.quizScore + "/5") : "Pas encore fait") : "—";
+      html += '<tr><td>Module ' + id + ' — ' + MODULE_META[id].title + '</td><td class="mono">' + statut + '</td><td class="mono">' + lessonsText + '</td><td class="mono">' + quizText + '</td></tr>';
+    });
+    html += '</tbody></table>';
+
+    if(state.profileDone){
+      var p = state.profile;
+      html += '<div class="block" style="margin-top:26px;"><h4>Ton profil</h4><div class="box">' +
+        '<div style="margin-bottom:6px;"><b>Compétences :</b> ' + (p.skills.length ? p.skills.join(", ") : "—") + '</div>' +
+        '<div style="margin-bottom:6px;"><b>Temps disponible :</b> ' + (p.time || "—") + '</div>' +
+        '<div style="margin-bottom:6px;"><b>Budget :</b> ' + (p.budget || "—") + '</div>' +
+        '<div style="margin-bottom:6px;"><b>Centres d\'intérêt :</b> ' + (p.interests || "—") + '</div>' +
+        '<div style="margin-bottom:6px;"><b>Niveau technique :</b> ' + (p.tech || "—") + '</div>' +
+        '<div><b>Préférence :</b> ' + (p.pref || "—") + '</div>' +
+        '</div></div>';
+    }
+    wrap.innerHTML = html;
+  }
+
+  /* ============================================================
+     NAVIGATION GLOBALE
+  ============================================================ */
+  $all("#nav-tabs button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var screen = btn.getAttribute("data-screen");
+      if(screen === "profile") fillProfileForm();
+      showScreen(screen);
+    });
+  });
+
+  $("#btn-start").addEventListener("click", function(){
+    if(!state.profileDone){
+      fillProfileForm();
+      showScreen("profile");
+    } else {
+      showScreen("dashboard");
+    }
+  });
+  $("#btn-see-modules").addEventListener("click", function(){ showScreen("dashboard"); });
+
+  /* ============================================================
+     INITIALISATION
+  ============================================================ */
+  showScreen(state.currentScreen || "home");
+  renderHome();
+
+})();
+</script>
+</body>
+</html>

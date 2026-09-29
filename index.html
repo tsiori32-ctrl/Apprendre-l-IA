@@ -819,8 +819,13 @@
     resetBtn.innerHTML = '<button class="btn ghost" id="btn-reset-module">↺ Recommencer ce module</button>';
     content.appendChild(resetBtn);
     $("#btn-reset-module").addEventListener("click", function(){
-      if(confirm("Recommencer le Module 1 ? Ta progression sur ce module sera remise à zéro.")){
+      if(confirm("Recommencer le Module 1 ? Ta progression sur ce module sera remise à zéro, et les modules suivants seront re-verrouillés.")){
         state.modules[1] = { unlocked: true, lessonsCompleted: [false,false,false,false,false], quizDone:false, quizScore:0, quizAnswers:[null,null,null,null,null], mastered:false };
+        // Re-verrouille les modules suivants puisqu'ils dépendent du module 1
+        state.modules[2].unlocked = false;
+        state.modules[2].mastered = false;
+        state.modules[3].unlocked = false;
+        state.modules[3].mastered = false;
         state.moduleView.tab = "lesson-0";
         saveState();
         toast("Module 1 réinitialisé");
@@ -1021,7 +1026,10 @@
     }
     var gotoM2 = $("#btn-goto-m2");
     if(gotoM2){
-      gotoM2.addEventListener("click", function(){ showScreen("dashboard"); });
+      // Ouvre directement le module 2 (qui affiche son placeholder tant que son contenu n'est pas prêt)
+      gotoM2.addEventListener("click", function(){
+        openModule(2);
+      });
     }
   }
 

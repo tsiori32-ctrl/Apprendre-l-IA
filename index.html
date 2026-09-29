@@ -612,6 +612,7 @@
       if(!parsed.modules) parsed.modules = d.modules;
       for(var m in d.modules){ if(!parsed.modules[m]) parsed.modules[m] = d.modules[m]; }
       if(!parsed.exerciseNotes) parsed.exerciseNotes = {};
+      if(!parsed.moduleView) parsed.moduleView = d.moduleView;
       return parsed;
     }catch(e){
       return defaultState();
@@ -741,16 +742,19 @@
   /* ============================================================
      ECRAN MODULE (leçons + quiz)
   ============================================================ */
+  function renderPlaceholderModule(id){
+    $("#module-content").innerHTML =
+      '<div class="eyebrow">Module ' + id + '</div>' +
+      '<h1 style="font-size:1.3rem;">' + MODULE_META[id].title + '</h1>' +
+      '<div class="card"><p style="margin:0;color:var(--muted);">Ce module arrive juste après le Module 1. Reviens ici une fois le Module 1 maîtrisé — le contenu détaillé (leçons + quiz) sera ajouté dans la prochaine version de ton parcours.</p></div>';
+  }
+
   function openModule(id){
     state.moduleView.moduleId = id;
     if(id !== 1){
-      // modules 2/3 : contenu à venir (structure prête, verrouillé tant que non débloqué logiquement,
-      // mais si jamais unlocked=true sans contenu, on affiche un message d'attente)
+      saveState();
       showScreen("module");
-      $("#module-content").innerHTML =
-        '<div class="eyebrow">Module ' + id + '</div>' +
-        '<h1 style="font-size:1.3rem;">' + MODULE_META[id].title + '</h1>' +
-        '<div class="card"><p style="margin:0;color:var(--muted);">Ce module arrive juste après le Module 1. Reviens ici une fois le Module 1 maîtrisé — le contenu détaillé (leçons + quiz) sera ajouté dans la prochaine version de ton parcours.</p></div>';
+      renderPlaceholderModule(id);
       return;
     }
     state.moduleView.tab = "lesson-0";
@@ -764,6 +768,15 @@
   function renderModule1(){
     var mod = state.modules[1];
     var tab = state.moduleView.tab;
+
+    // Robustesse : si l'onglet est "quiz" mais que toutes les leçons ne sont pas validées,
+    // on retombe sur la première leçon.
+    if(tab === "quiz" && !mod.lessonsCompleted.every(Boolean)){
+      tab = "lesson-0";
+      state.moduleView.tab = tab;
+      saveState();
+    }
+
     var content = $("#module-content");
 
     var pillsHtml = '<div class="lesson-pills">';
@@ -820,7 +833,6 @@
     var l = LESSONS_M1[i];
     var noteKey = "m1-" + i;
     var savedNote = state.exerciseNotes[noteKey] || "";
-    var diffPct = (l.difficulty/10*100);
 
     return (
       '<h2 style="font-size:1.2rem;margin:14px 0 4px;">' + (i+1) + '. ' + l.title + '</h2>' +
@@ -848,6 +860,12 @@
     var noteKey = "m1-" + i;
     var textarea = $("#exercise-note");
     if(textarea){
+      // Sauvegarde à chaque frappe (input) ET à la perte de focus (blur)
+      // pour ne rien perdre si l'utilisateur clique directement sur une autre pastille.
+      textarea.addEventListener("input", function(){
+        state.exerciseNotes[noteKey] = textarea.value;
+        saveState();
+      });
       textarea.addEventListener("blur", function(){
         state.exerciseNotes[noteKey] = textarea.value;
         saveState();
@@ -886,12 +904,23 @@
     QUIZ_M1.forEach(function(q, qi){
       html += '<div class="quiz-q"><p class="q-text">' + (qi+1) + '. ' + q.q + '</p>';
       q.options.forEach(function(opt, oi){
-        html += '<label class="opt"><input type="radio" name="q' + qi + '" value="' + oi + '"> <span>' + opt + '</span></label>';
+        var checkedAttr = (mod.quizAnswers[qi] === oi) ? " checked" : "";
+        html += '<label class="opt"><input type="radio" name="q' + qi + '" value="' + oi + '"' + checkedAttr + '> <span>' + opt + '</span></label>';
       });
       html += '</div>';
     });
     html += '<div class="btn-row"><button class="btn" id="btn-submit-quiz">Valider mes réponses</button></div>';
     zone.innerHTML = html;
+
+    // Persiste les réponses au fur et à mesure (utile si l'utilisateur recharge la page)
+    QUIZ_M1.forEach(function(q, qi){
+      $all('input[name="q' + qi + '"]').forEach(function(inp){
+        inp.addEventListener("change", function(){
+          mod.quizAnswers[qi] = parseInt(inp.value, 10);
+          saveState();
+        });
+      });
+    });
 
     $("#btn-submit-quiz").addEventListener("click", function(){
       var answers = [];
@@ -983,6 +1012,8 @@
     if(retakeBtn){
       retakeBtn.addEventListener("click", function(){
         mod.quizDone = false;
+        mod.quizScore = 0;
+        mod.mastered = false;
         mod.quizAnswers = [null,null,null,null,null];
         saveState();
         renderQuiz1();
@@ -1051,7 +1082,21 @@
   /* ============================================================
      INITIALISATION
   ============================================================ */
-  showScreen(state.currentScreen || "home");
+  var startScreen = state.currentScreen || "home";
+  showScreen(startScreen);
+
+  // Correction du bug : si on démarre directement sur l'écran "module"
+  // (ex : après un rechargement de page), il faut rendre le contenu du module,
+  // sinon l'écran est vide.
+  if(startScreen === "module"){
+    var mid = state.moduleView.moduleId || 1;
+    if(mid === 1){
+      renderModule1();
+    } else {
+      renderPlaceholderModule(mid);
+    }
+  }
+
   renderHome();
 
 })();
